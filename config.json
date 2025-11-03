@@ -6,6 +6,6 @@
   "font_path": "DejaVuSans.ttf",
   "font_size": 30,
   "message_prefix": "Temps restant : ",
-  "target_date": "2025-11-10T23:59:59",
+  "target_date": "2025-11-03T14:25:59",
   "loop_duration": 40
 }
