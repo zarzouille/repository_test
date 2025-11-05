@@ -49,7 +49,7 @@
 </head>
 <body>
   <h2>🧩 Configuration du Countdown</h2>
-  <form method="POST">
+  <form id="settingsForm" method="POST">
     <label>Date cible :
       <input type="datetime-local" name="target_date"
 		      value="{{ config.target_date[:16].replace('T', ' ') }}">
@@ -76,19 +76,34 @@
 
   <div class="preview">
     <h3>🖼️ Aperçu du compte à rebours</h3>
-    <img src="/countdown.gif?{{ config.target_date }}" alt="Prévisualisation du GIF" width="600" height="200">
+    <img id="previewImage" src="/countdown.gif?cache={{ config.target_date }}" alt="Prévisualisation du GIF" width="600" height="200">
   </div>
 
   <p><a href="/">⬅️ Retour à l’accueil</a></p>
 
   <script>
-    // Rafraîchir automatiquement le GIF après enregistrement
-    const form = document.querySelector('form');
-    form.addEventListener('submit', () => {
-	    setTimeout(() => {
-		    const img = document.querySelector('.preview img');
-		    img.src = '/countdown.gif?cache=' + Date.now(); // force refresh
-	    }, 1500);
+    const form = document.getElementById('settingsForm');
+    const preview = document.getElementById('previewImage');
+    
+    form.addEventListener('submit', async (e) => {
+	    e.preventDefault();
+	    
+	    const formData = new FormData(form);
+	    const data = {};
+	    formData.forEach((v, k) => data[k] = v);
+	    
+	    const res = await fetch('/settings', {
+		    method: 'POST',
+		    headers: { 'Content-Type': 'application/json' },
+		    body: JSON.stringify(data)
+	    });
+	    
+	    if (res.ok) {
+		    // Recharge le GIF sans recharger la page
+		    preview.src = '/countdown.gif?cache=' + Date.now();
+	    } else {
+		    alert("Erreur lors de la mise à jour !");
+	    }
     });
   </script>
 </body>
