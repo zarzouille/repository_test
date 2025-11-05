@@ -7,12 +7,12 @@
     body { font-family: sans-serif; background: #fafafa; padding: 2rem; }
     label { display: block; margin-top: 1rem; }
     input[type="text"], input[type="color"], input[type="datetime-local"], input[type="number"] {
-      padding: 6px; margin-top: 4px; width: 100%; max-width: 300px;
-    }
+	    padding: 6px; margin-top: 4px; width: 100%; max-width: 300px;
+	    }
     button {
-      margin-top: 1.5rem; padding: 10px 20px; font-size: 16px;
-      background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;
-    }
+	    margin-top: 1.5rem; padding: 10px 20px; font-size: 16px;
+	    background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;
+	    }
     button:hover { background: #0056b3; }
   </style>
 </head>
@@ -21,23 +21,23 @@
   <form method="POST">
     <label>Date cible :
       <input type="datetime-local" name="target_date"
-             value="{{ config['target_date']|replace('T', ' ')[:16] }}">
+		      value="{{ config.target_date[:16].replace('T', ' ') }}">
     </label>
 
     <label>Couleur de fond :
-      <input type="color" name="background_color" value="{{ config['background_color'] }}">
+      <input type="color" name="background_color" value="{{ config.background_color }}">
     </label>
 
     <label>Couleur du texte :
-      <input type="color" name="text_color" value="{{ config['text_color'] }}">
+      <input type="color" name="text_color" value="{{ config.text_color }}">
     </label>
 
     <label>Taille du texte :
-      <input type="number" name="font_size" value="{{ config['font_size'] }}" min="10" max="200">
+      <input type="number" name="font_size" value="{{ config.font_size }}" min="10" max="200">
     </label>
 
     <label>Préfixe du message :
-      <input type="text" name="message_prefix" value="{{ config['message_prefix'] }}">
+      <input type="text" name="message_prefix" value="{{ config.message_prefix }}">
     </label>
 
     <button type="submit">💾 Valider</button>
