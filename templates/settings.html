@@ -52,7 +52,7 @@
   <form id="settingsForm" method="POST">
     <label>Date cible :
       <input type="datetime-local" name="target_date"
-		      value="{{ config.target_date[:16].replace('T', ' ') }}">
+		      value="{{ config['target_date']|replace(' ', 'T')[:16] }}">
     </label>
 
     <label>Couleur de fond :
