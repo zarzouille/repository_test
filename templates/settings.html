@@ -1,75 +1,135 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Modifier le design</title>
-    <style>
-        body {
-	        font-family: Arial, sans-serif;
-	        background-color: {{ config.background_color }};
-	        color: {{ config.font_color }};
-	        text-align: center;
-	        padding: 30px;
-	        }
-        form {
-	        background: rgba(255, 255, 255, 0.05);
-	        padding: 25px;
-	        border-radius: 12px;
-	        display: inline-block;
-	        text-align: left;
-	        }
-        label {
-	        display: block;
-	        margin-top: 10px;
-	        font-size: 14px;
-	        }
-        input, select {
-	        margin-top: 5px;
-	        padding: 8px;
-	        width: 100%;
-	        font-size: 14px;
-	        }
-        button {
-	        margin-top: 20px;
-	        padding: 10px 20px;
-	        font-size: 16px;
-	        border: none;
-	        border-radius: 8px;
-	        cursor: pointer;
-	        background-color: #4CAF50;
-	        color: white;
-	        }
-        button:hover {
-	        background-color: #45a049;
-	        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Modifier le design</title>
+  <style>
+    body {
+	    font-family: Arial, sans-serif;
+	    background-color: {{ config.background_color }};
+	    color: {{ config.font_color }};
+	    text-align: center;
+	    padding: 30px;
+	    }
+    
+    form {
+	    background: rgba(255, 255, 255, 0.05);
+	    padding: 25px;
+	    border-radius: 12px;
+	    display: inline-block;
+	    text-align: left;
+	    margin-bottom: 30px;
+	    }
+    
+    label {
+	    display: block;
+	    margin-top: 10px;
+	    font-size: 14px;
+	    }
+    
+    input, select {
+	    margin-top: 5px;
+	    padding: 8px;
+	    width: 100%;
+	    font-size: 14px;
+	    }
+    
+    button {
+	    margin-top: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    border: none;
+	    border-radius: 8px;
+	    cursor: pointer;
+	    background-color: #4CAF50;
+	    color: white;
+	    }
+    
+    button:hover {
+	    background-color: #45a049;
+	    }
+    
+    #preview {
+	    padding: 40px;
+	    border-radius: 12px;
+	    margin-top: 20px;
+	    display: inline-block;
+	    min-width: 300px;
+	    font-weight: bold;
+	    }
+  </style>
 </head>
 <body>
-    <h1>Modifier le design</h1>
-    <form method="POST" action="/settings">
-        <label for="target_date">Date cible :</label>
-        <input type="datetime-local" id="target_date" name="target_date" value="{{ target_date }}" required>
+  <h1>Modifier le design</h1>
 
-        <label for="font_size">Taille de police :</label>
-        <input type="number" id="font_size" name="font_size" min="10" max="200" value="{{ config.font_size }}">
+  <form method="POST" action="/settings" id="configForm">
+    <label for="target_date">Date cible :</label>
+    <input type="datetime-local" id="target_date" name="target_date" value="{{ target_date }}" required>
 
-        <label for="font_color">Couleur du texte :</label>
-        <input type="color" id="font_color" name="font_color" value="{{ config.font_color }}">
+    <label for="font_size">Taille de police :</label>
+    <input type="number" id="font_size" name="font_size" min="10" max="200" value="{{ config.font_size }}">
 
-        <label for="background_color">Couleur de fond :</label>
-        <input type="color" id="background_color" name="background_color" value="{{ config.background_color }}">
+    <label for="font_color">Couleur du texte :</label>
+    <input type="color" id="font_color" name="font_color" value="{{ config.font_color }}">
 
-        <label for="design">Design :</label>
-        <select id="design" name="design">
-            <option value="form" {% if config.design == "form" %}selected{% endif %}>Form</option>
-	        <option value="gif" {% if config.design == "gif" %}selected{% endif %}>GIF</option>
-        </select>
+    <label for="background_color">Couleur de fond :</label>
+    <input type="color" id="background_color" name="background_color" value="{{ config.background_color }}">
 
-        <button type="submit">Valider</button>
-    </form>
+    <label for="design">Design :</label>
+    <select id="design" name="design">
+      <option value="form" {% if config.design == "form" %}selected{% endif %}>Form</option>
+	    <option value="gif" {% if config.design == "gif" %}selected{% endif %}>GIF</option>
+    </select>
 
-    <p style="margin-top: 20px;">
-        <a href="/" style="color: #ccc; text-decoration: none;">⬅ Retour à l'accueil</a>
-    </p>
+    <button type="submit">💾 Valider</button>
+  </form>
+
+  <h2>Aperçu en direct</h2>
+  <div id="preview">Chargement de l’aperçu...</div>
+
+  <p style="margin-top: 20px;">
+    <a href="/" style="color: #ccc; text-decoration: none;">⬅ Retour à l'accueil</a>
+  </p>
+
+  <script>
+    const preview = document.getElementById("preview");
+    const dateInput = document.getElementById("target_date");
+    const fontSizeInput = document.getElementById("font_size");
+    const textColorInput = document.getElementById("font_color");
+    const bgColorInput = document.getElementById("background_color");
+    
+    function updatePreview() {
+	    const fontSize = fontSizeInput.value + "px";
+	    const textColor = textColorInput.value;
+	    const bgColor = bgColorInput.value;
+	    const targetDate = new Date(dateInput.value);
+	    
+	    preview.style.backgroundColor = bgColor;
+	    preview.style.color = textColor;
+	    preview.style.fontSize = fontSize;
+	    
+	    if (isNaN(targetDate)) {
+		    preview.textContent = "Sélectionne une date valide";
+		    return;
+	    }
+	    
+	    const now = new Date();
+	    const diff = targetDate - now;
+	    if (diff <= 0) {
+		    preview.textContent = "🎉 C’est terminé !";
+	    } else {
+		    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+		    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+		    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+		    const seconds = Math.floor((diff / 1000) % 60);
+		    preview.textContent = `${days}j ${hours}h ${minutes}m ${seconds}s restants`;
+	    }
+    }
+    
+    // Rafraîchissement live du compte à rebours
+    setInterval(updatePreview, 1000);
+    document.querySelectorAll("input, select").forEach(el => el.addEventListener("input", updatePreview));
+    updatePreview();
+  </script>
 </body>
 </html>
