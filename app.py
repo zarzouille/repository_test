@@ -1,102 +1,50 @@
-import os
-import json
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
-from flask import Flask, render_template, request, send_file, redirect, url_for
-from PIL import Image, ImageDraw, ImageFont
+import os
 
 app = Flask(__name__)
 
-CONFIG_PATH = "config.json"
+# === CONFIGURATION PAR DÉFAUT ===
+CONFIG = {
+    "target_date": "2025-12-31 23:59:00",
+    "font_size": 40,
+    "font_color": "#FFFFFF",
+    "background_color": "#000000",
+    "design": "form"
+}
 
-# --- 1️⃣ Chargement de la configuration ---
-def load_config():
-    """Charge le fichier de configuration ou renvoie les valeurs par défaut."""
-    if os.path.exists(CONFIG_PATH):
-        try:
-            with open(CONFIG_PATH, "r") as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            print("⚠️ Erreur de lecture du config.json — fichier réinitialisé.")
-    # Valeurs par défaut
-    return {
-        "target_date": "2025-12-31T23:59",
-        "background_color": "#000000",
-        "text_color": "#FFFFFF",
-        "font_size": 40,
-        "message_prefix": "Temps restant :"
-    }
 
-CONFIG = load_config()
-
-# --- 2️⃣ Sauvegarde de la config ---
-def save_config():
-    """Sauvegarde la configuration actuelle dans le fichier JSON."""
-    with open(CONFIG_PATH, "w") as f:
-        json.dump(CONFIG, f, indent=2)
-
-# --- 3️⃣ Page principale ---
+# === ROUTE PAGE D’ACCUEIL ===
 @app.route("/")
 def index():
     return render_template("index.html", config=CONFIG)
 
-# --- 4️⃣ Page de configuration ---
+
+# === ROUTE PAGE DE PARAMÈTRES ===
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
     if request.method == "POST":
-        CONFIG["target_date"] = request.form.get("target_date")
-        CONFIG["background_color"] = request.form.get("background_color")
-        CONFIG["text_color"] = request.form.get("text_color")
-        CONFIG["font_size"] = int(request.form.get("font_size") or 40)
-        CONFIG["message_prefix"] = request.form.get("message_prefix", "Temps restant :")
-        save_config()
+        CONFIG["target_date"] = request.form.get("target_date", CONFIG["target_date"]).replace("T", " ")
+        CONFIG["font_size"] = int(request.form.get("font_size", CONFIG["font_size"]))
+        CONFIG["font_color"] = request.form.get("font_color", CONFIG["font_color"])
+        CONFIG["background_color"] = request.form.get("background_color", CONFIG["background_color"])
+        CONFIG["design"] = request.form.get("design", CONFIG["design"])
+
+        # Redirection vers l'accueil après sauvegarde
         return redirect(url_for("index"))
-    return render_template("settings.html", config=CONFIG)
 
-# --- 5️⃣ Génération dynamique du GIF ---
-@app.route("/countdown.gif")
-def countdown_gif():
-    """Crée dynamiquement une image GIF représentant le compte à rebours."""
+    # Conversion du format pour le champ <input type="datetime-local">
+    target_formatted = CONFIG["target_date"]
     try:
-        target = datetime.strptime(CONFIG["target_date"], "%Y-%m-%dT%H:%M")
-        remaining = target - datetime.now()
-        if remaining.total_seconds() < 0:
-            text = "Terminé !"
-        else:
-            days = remaining.days
-            hours, remainder = divmod(remaining.seconds, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            text = f"{CONFIG['message_prefix']} {days}j {hours}h {minutes}m {seconds}s"
+        target_formatted = datetime.strptime(target_formatted, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%dT%H:%M")
+    except:
+        pass
 
-        # Création de l'image
-        img = Image.new("RGB", (800, 200), CONFIG["background_color"])
-        draw = ImageDraw.Draw(img)
-        try:
-            font = ImageFont.truetype("arial.ttf", CONFIG["font_size"])
-        except IOError:
-            font = ImageFont.load_default()
-
-        # Calcul pour centrer le texte
-        bbox = draw.textbbox((0, 0), text, font=font)
-        text_w = bbox[2] - bbox[0]
-        text_h = bbox[3] - bbox[1]
-        draw.text(
-            ((800 - text_w) / 2, (200 - text_h) / 2),
-            text,
-            fill=CONFIG["text_color"],
-            font=font,
-        )
-
-        img.save("countdown.gif", "GIF")
-        return send_file("countdown.gif", mimetype="image/gif")
-
-    except Exception as e:
-        print(f"❌ Erreur dans countdown_gif : {e}")
-        return "Erreur lors de la génération du GIF.", 500
+    return render_template("settings.html", config=CONFIG, target_date=target_formatted)
 
 
-# --- 6️⃣ Exécution locale (et compatibilité Render) ---
+# === MODE LOCAL / RENDER ===
 if __name__ == "__main__":
-    # Render définit le port via la variable d'environnement PORT
+    # Render définit un port via la variable d'environnement PORT
     port = int(os.environ.get("PORT", 5000))
-    print(f"🚀 Application démarrée sur http://localhost:{port}")
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port)

@@ -1,110 +1,75 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Configurer le Countdown</title>
-  <style>
-    body {
-	    font-family: sans-serif;
-	    background: #fafafa;
-	    padding: 2rem;
-	    text-align: center;
-	    }
-    form {
-	    display: inline-block;
-	    text-align: left;
-	    background: white;
-	    padding: 1.5rem 2rem;
-	    border-radius: 10px;
-	    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-	    margin-bottom: 2rem;
-	    }
-    label { display: block; margin-top: 1rem; }
-    input[type="text"], input[type="color"], input[type="datetime-local"], input[type="number"] {
-	    padding: 6px;
-	    margin-top: 4px;
-	    width: 100%;
-	    max-width: 300px;
-	    }
-    button {
-	    margin-top: 1.5rem;
-	    padding: 10px 20px;
-	    font-size: 16px;
-	    background: #007bff;
-	    color: white;
-	    border: none;
-	    border-radius: 5px;
-	    cursor: pointer;
-	    }
-    button:hover { background: #0056b3; }
-    .preview {
-	    margin-top: 2rem;
-	    padding: 1rem;
-	    background: #fff;
-	    border-radius: 10px;
-	    display: inline-block;
-	    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-	    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Modifier le design</title>
+    <style>
+        body {
+	        font-family: Arial, sans-serif;
+	        background-color: {{ config.background_color }};
+	        color: {{ config.font_color }};
+	        text-align: center;
+	        padding: 30px;
+	        }
+        form {
+	        background: rgba(255, 255, 255, 0.05);
+	        padding: 25px;
+	        border-radius: 12px;
+	        display: inline-block;
+	        text-align: left;
+	        }
+        label {
+	        display: block;
+	        margin-top: 10px;
+	        font-size: 14px;
+	        }
+        input, select {
+	        margin-top: 5px;
+	        padding: 8px;
+	        width: 100%;
+	        font-size: 14px;
+	        }
+        button {
+	        margin-top: 20px;
+	        padding: 10px 20px;
+	        font-size: 16px;
+	        border: none;
+	        border-radius: 8px;
+	        cursor: pointer;
+	        background-color: #4CAF50;
+	        color: white;
+	        }
+        button:hover {
+	        background-color: #45a049;
+	        }
+    </style>
 </head>
 <body>
-  <h2>🧩 Configuration du Countdown</h2>
-  <form id="settingsForm" method="POST">
-    <label>Date cible :
-      <input type="datetime-local" name="target_date"
-		      value="{{ config['target_date']|replace(' ', 'T')[:16] }}">
-    </label>
+    <h1>Modifier le design</h1>
+    <form method="POST" action="/settings">
+        <label for="target_date">Date cible :</label>
+        <input type="datetime-local" id="target_date" name="target_date" value="{{ target_date }}" required>
 
-    <label>Couleur de fond :
-      <input type="color" name="background_color" value="{{ config.background_color }}">
-    </label>
+        <label for="font_size">Taille de police :</label>
+        <input type="number" id="font_size" name="font_size" min="10" max="200" value="{{ config.font_size }}">
 
-    <label>Couleur du texte :
-      <input type="color" name="text_color" value="{{ config.text_color }}">
-    </label>
+        <label for="font_color">Couleur du texte :</label>
+        <input type="color" id="font_color" name="font_color" value="{{ config.font_color }}">
 
-    <label>Taille du texte :
-      <input type="number" name="font_size" value="{{ config.font_size }}" min="10" max="200">
-    </label>
+        <label for="background_color">Couleur de fond :</label>
+        <input type="color" id="background_color" name="background_color" value="{{ config.background_color }}">
 
-    <label>Préfixe du message :
-      <input type="text" name="message_prefix" value="{{ config.message_prefix }}">
-    </label>
+        <label for="design">Design :</label>
+        <select id="design" name="design">
+            <option value="form" {% if config.design == "form" %}selected{% endif %}>Form</option>
+	        <option value="gif" {% if config.design == "gif" %}selected{% endif %}>GIF</option>
+        </select>
 
-    <button type="submit">💾 Valider</button>
-  </form>
+        <button type="submit">Valider</button>
+    </form>
 
-  <div class="preview">
-    <h3>🖼️ Aperçu du compte à rebours</h3>
-    <img id="previewImage" src="/countdown.gif?cache={{ config.target_date }}" alt="Prévisualisation du GIF" width="600" height="200">
-  </div>
-
-  <p><a href="/">⬅️ Retour à l’accueil</a></p>
-
-  <script>
-    const form = document.getElementById('settingsForm');
-    const preview = document.getElementById('previewImage');
-    
-    form.addEventListener('submit', async (e) => {
-	    e.preventDefault();
-	    
-	    const formData = new FormData(form);
-	    const data = {};
-	    formData.forEach((v, k) => data[k] = v);
-	    
-	    const res = await fetch('/settings', {
-		    method: 'POST',
-		    headers: { 'Content-Type': 'application/json' },
-		    body: JSON.stringify(data)
-	    });
-	    
-	    if (res.ok) {
-		    // Recharge le GIF sans recharger la page
-		    preview.src = '/countdown.gif?cache=' + Date.now();
-	    } else {
-		    alert("Erreur lors de la mise à jour !");
-	    }
-    });
-  </script>
+    <p style="margin-top: 20px;">
+        <a href="/" style="color: #ccc; text-decoration: none;">⬅ Retour à l'accueil</a>
+    </p>
 </body>
 </html>
