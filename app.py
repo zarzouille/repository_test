@@ -88,7 +88,7 @@ def countdown_gif():
         remaining = int((end_time - current_time).total_seconds())
 
         if remaining <= 0 and "preview" not in request.args:
-            text = "⏰ Terminé !"
+            text = "⏰ Terminé"
         else:
             days, rem = divmod(remaining, 86400)
             hours, rem = divmod(rem, 3600)
