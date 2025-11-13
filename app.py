@@ -3,7 +3,7 @@ import json
 import sys
 from datetime import datetime, timedelta
 from io import BytesIO
-from flask import Flask, send_file, request, render_template, redirect, url_for
+from flask import Flask, send_file, request, render_template
 from PIL import Image, ImageDraw, ImageFont
 from json import JSONDecodeError
 
@@ -49,11 +49,7 @@ CONFIG = load_config()
 # ============================
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return render_template("index.html", config=CONFIG)
-
-@app.route("/settings", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def settings():
     global CONFIG
     if request.method == "POST":
@@ -63,7 +59,6 @@ def settings():
         CONFIG["font_size"] = int(request.form.get("font_size", CONFIG["font_size"]))
         CONFIG["message_prefix"] = request.form.get("message_prefix", CONFIG["message_prefix"])
         save_config(CONFIG)
-        return redirect(url_for("download_gif"))
     return render_template("settings.html", config=CONFIG)
 
 # ============================
@@ -76,7 +71,7 @@ def countdown_gif():
     try:
         end_time = datetime.fromisoformat(cfg["target_date"])
     except ValueError:
-        return "Date invalide dans config.json", 400
+        return "Date invalide", 400
 
     now = datetime.utcnow()
     frames = []
@@ -114,56 +109,6 @@ def countdown_gif():
     frames[0].save(buf, format="GIF", save_all=True, append_images=frames[1:], loop=0, duration=1000)
     buf.seek(0)
     return send_file(buf, mimetype="image/gif")
-
-# ============================
-# TÉLÉCHARGEMENT DU GIF
-# ============================
-@app.route("/download")
-def download_gif():
-    """Génère le GIF et le renvoie en téléchargement"""
-    cfg = load_config()
-    try:
-        end_time = datetime.fromisoformat(cfg["target_date"])
-    except ValueError:
-        return "Date invalide", 400
-
-    now = datetime.utcnow()
-    frames = []
-    loop_duration = cfg.get("loop_duration", 10)
-
-    for i in range(loop_duration):
-        current_time = now + timedelta(seconds=i)
-        remaining = int((end_time - current_time).total_seconds())
-
-        if remaining <= 0:
-            text = "⏰ Terminé !"
-        else:
-            days, rem = divmod(remaining, 86400)
-            hours, rem = divmod(rem, 3600)
-            minutes, seconds = divmod(rem, 60)
-            text = f"{cfg['message_prefix']}{days}j {hours:02}:{minutes:02}:{seconds:02}"
-
-        img = Image.new("RGB", (cfg["width"], cfg["height"]), cfg["background_color"])
-        draw = ImageDraw.Draw(img)
-
-        try:
-            font = ImageFont.truetype(cfg["font_path"], cfg["font_size"])
-        except:
-            font = ImageFont.load_default()
-
-        text_bbox = draw.textbbox((0, 0), text, font=font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
-        x = (cfg["width"] - text_width) // 2
-        y = (cfg["height"] - text_height) // 2
-        draw.text((x, y), text, font=font, fill=cfg["text_color"])
-
-        frames.append(img)
-
-    buf = BytesIO()
-    frames[0].save(buf, format="GIF", save_all=True, append_images=frames[1:], loop=0, duration=1000)
-    buf.seek(0)
-    return send_file(buf, mimetype="image/gif", as_attachment=True, download_name="countdown.gif")
 
 # ============================
 # LANCEMENT SERVEUR
