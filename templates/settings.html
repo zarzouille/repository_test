@@ -73,27 +73,42 @@
     <h1>🎨 Personnaliser votre compte à rebours</h1>
 
     <form method="POST">
-        <label>Date cible :</label>
-        <input type="datetime-local" name="target_date" value="{{ config.target_date.replace(' ', 'T') }}">
+    <label>Date cible :
+      <input type="datetime-local" name="target_date"
+		      value="{{ config['target_date']|replace('T', ' ')[:16] }}">
+    </label>
 
-        <label>Couleur de fond :</label>
-        <input type="color" name="background_color" value="{{ config.background_color }}">
+    <label>Couleur de fond :
+      <input type="color" name="background_color" value="{{ config['background_color'] }}">
+    </label>
 
-        <label>Couleur du texte :</label>
-        <input type="color" name="text_color" value="{{ config.text_color }}">
+    <label>Couleur du texte :
+      <input type="color" name="text_color" value="{{ config['text_color'] }}">
+    </label>
 
-        <label>Taille de la police :</label>
-        <input type="number" name="font_size" value="{{ config.font_size }}">
+    <label>Taille du texte :
+      <input type="number" name="font_size" value="{{ config['font_size'] }}" min="10" max="200">
+    </label>
 
-        <label>Texte avant le compte à rebours :</label>
-        <input type="text" name="message_prefix" value="{{ config.message_prefix }}">
+    <label>Préfixe du message :
+      <input type="text" name="message_prefix" value="{{ config['message_prefix'] }}">
+    </label>
+	    
+	    <!-- 🖼️ Aperçu dynamique du GIF -->
+    <div style="margin-top: 2rem; text-align: center;">
+      <p><strong>Aperçu du compte à rebours :</strong></p>
+      <img id="gifPreview" src="/countdown.gif?preview=1"
+		      alt="Aperçu du compte à rebours"
+		      width="400"
+		      style="border: 1px solid #ccc; border-radius: 8px; background: white; padding: 10px;">
+    </div>
 
-        <button type="submit">💾 Sauvegarder et générer</button>
-    </form>
+    <button type="submit">💾 Valider & Télécharger le GIF</button>
+</form>
 
     <div id="preview">
         <h2>Aperçu en direct</h2>
-        <img id="gifPreview" src="/countdown.gif?{{ config.target_date }}" width="400">
+        <img id="gifPreview" src="/countdown.gif?preview=1" alt="Aperçu du compte à rebours" width="400">
         <br><br>
         <a id="downloadBtn" href="/countdown.gif" download="countdown.gif">
             ⬇️ Télécharger le GIF
@@ -101,10 +116,11 @@
     </div>
 
     <script>
-        const form = document.querySelector("form");
-        form.addEventListener("input", () => {
-	        document.getElementById("gifPreview").src = "/countdown.gif?" + Date.now();
-        });
-    </script>
+    const form = document.querySelector("form");
+    form.addEventListener("input", () => {
+	    // Recharge le GIF d’aperçu à chaque changement
+	    document.getElementById("gifPreview").src = "/countdown.gif?preview=1&" + Date.now();
+    });
+</script>
 </body>
 </html>
