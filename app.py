@@ -69,6 +69,23 @@ def settings():
 @app.route("/countdown.gif")
 def countdown_gif():
     cfg = load_config()
+    # Mode preview dynamique (aperçu live)
+    if "preview" in request.args:
+        # couleurs et taille modifiées en direct
+        cfg["background_color"] = request.args.get("bg", cfg["background_color"])
+        cfg["text_color"] = request.args.get("txt", cfg["text_color"])
+        try:
+            cfg["font_size"] = int(request.args.get("size", cfg["font_size"]))
+        except:
+            pass
+
+        # date factice pour l’aperçu (sinon “Terminé”)
+        fake_seconds = (datetime.utcnow().second * 7) % 86400
+        days, rem = divmod(fake_seconds, 86400)
+        hours, rem = divmod(rem, 3600)
+        minutes, seconds = divmod(rem, 60)
+        cfg["preview_text"] = f"{cfg['message_prefix']}{days}j {hours:02}:{minutes:02}:{seconds:02}"
+
     loop_duration = cfg.get("loop_duration", 10)
 
     # Mode aperçu (ne dépend pas de la vraie date)
@@ -87,13 +104,12 @@ def countdown_gif():
         current_time = now + timedelta(seconds=i)
         remaining = int((end_time - current_time).total_seconds())
 
-        if remaining <= 0 and "preview" not in request.args:
-            text = "⏰ Terminé"
-        else:
-            days, rem = divmod(remaining, 86400)
-            hours, rem = divmod(rem, 3600)
-            minutes, seconds = divmod(rem, 60)
-            text = f"{cfg['message_prefix']}{days}j {hours:02}:{minutes:02}:{seconds:02}"
+        if remaining <= 0:
+            if "preview" in request.args:
+                text = cfg["preview_text"]
+            else:
+                text = "⏰ Terminé !"
+
 
         img = Image.new("RGB", (cfg["width"], cfg["height"]), cfg["background_color"])
         draw = ImageDraw.Draw(img)

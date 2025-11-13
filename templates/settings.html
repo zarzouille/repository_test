@@ -108,10 +108,18 @@
 
     <script>
     const form = document.querySelector("form");
+    
     form.addEventListener("input", () => {
-	    // Recharge le GIF d’aperçu à chaque changement
-	    document.getElementById("gifPreview").src = "/countdown.gif?preview=1&" + Date.now();
+	    const bg = document.querySelector("[name='background_color']").value;
+	    const txt = document.querySelector("[name='text_color']").value;
+	    const size = document.querySelector("[name='font_size']").value;
+	    const prefix = document.querySelector("[name='message_prefix']").value;
+	    
+	    document.getElementById("gifPreview").src =
+			    `/countdown.gif?preview=1&bg=${bg}&txt=${txt}&size=${size}&prefix=${encodeURIComponent(prefix)}&` + Date.now();
     });
 </script>
+
+
 </body>
 </html>
