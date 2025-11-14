@@ -2,12 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Configurer le compte à rebours</title>
+  <title>Créer un compte à rebours</title>
   <style>
     body {
 	    font-family: Arial, sans-serif;
 	    background: #f5f5f5;
-	    color: #222;
 	    margin: 0;
 	    padding: 20px;
 	    display: flex;
@@ -16,30 +15,32 @@
 	    gap: 20px;
 	    }
     
-    h1 { margin-bottom: 5px; }
+    h1 {
+	    margin-bottom: 10px;
+	    }
     
     .container {
+	    width: 100%;
+	    max-width: 900px;
 	    display: flex;
 	    flex-direction: column;
-	    gap: 20px;
-	    width: 100%;
-	    max-width: 800px;
+	    gap: 25px;
 	    }
     
     form {
-	    background: #ffffff;
-	    padding: 20px;
+	    background: #fff;
+	    padding: 25px;
 	    border-radius: 12px;
-	    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 	    display: grid;
 	    grid-template-columns: 1fr 1fr;
-	    gap: 15px 20px;
+	    gap: 20px;
 	    }
     
     label {
 	    font-size: 14px;
+	    margin-bottom: 5px;
 	    display: block;
-	    margin-bottom: 4px;
 	    }
     
     input[type="text"],
@@ -47,8 +48,8 @@
     input[type="color"],
     input[type="number"] {
 	    width: 100%;
-	    padding: 6px;
-	    font-size: 14px;
+	    padding: 7px;
+	    font-size: 15px;
 	    box-sizing: border-box;
 	    }
     
@@ -58,10 +59,10 @@
     
     button {
 	    grid-column: 1 / 3;
-	    padding: 10px 20px;
-	    font-size: 16px;
+	    padding: 12px;
+	    font-size: 17px;
 	    background: #007bff;
-	    color: white;
+	    color: #fff;
 	    border: none;
 	    border-radius: 6px;
 	    cursor: pointer;
@@ -71,144 +72,143 @@
 	    background: #0056b3;
 	    }
     
-    .preview-box {
+    .preview-box,
+    .link-box {
 	    background: #fff;
-	    padding: 20px;
+	    padding: 25px;
 	    border-radius: 12px;
-	    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 	    }
     
     #htmlPreview {
 	    width: 100%;
 	    max-width: 600px;
 	    height: 200px;
-	    margin: 0 auto;
-	    border-radius: 10px;
+	    border-radius: 12px;
 	    display: flex;
 	    align-items: center;
 	    justify-content: center;
 	    font-weight: bold;
-	    }
-    
-    .link-box {
-	    background: #fff;
-	    padding: 20px;
-	    border-radius: 12px;
-	    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-	    }
-    
-    .link-input {
-	    width: 100%;
-	    padding: 8px;
-	    font-size: 14px;
-	    box-sizing: border-box;
-	    }
-    
-    .note {
-	    font-size: 13px;
-	    color: #555;
+	    margin: 0 auto;
 	    }
     
     .small {
 	    font-size: 13px;
 	    color: #666;
 	    }
+    
+    .link-input {
+	    width: 100%;
+	    font-size: 15px;
+	    padding: 8px;
+	    box-sizing: border-box;
+	    margin-top: 10px;
+	    }
+    
+    .img-code {
+	    background: #eee;
+	    padding: 10px;
+	    border-radius: 6px;
+	    font-size: 14px;
+	    margin-top: 8px;
+	    }
+
   </style>
 </head>
 <body>
-  <h1>🕒 Générateur de compte à rebours</h1>
-  <p class="small">Configure ton compte à rebours, puis utilise le lien généré dans tes emails.</p>
+
+  <h1>🕒 Créer un nouveau compte à rebours</h1>
+  <p class="small">Chaque sauvegarde génère un nouveau countdown indépendant avec son propre lien.</p>
 
   <div class="container">
-    <!-- FORMULAIRE DE CONFIG -->
+
+    <!-- FORMULAIRE -->
     <form method="POST" id="configForm">
       <div class="full-row">
-        <label for="target_date">Date cible :</label>
-        <input type="datetime-local" id="target_date" name="target_date"
-		        value="{{ target_date }}" required>
+        <label>Date cible :</label>
+        <input type="datetime-local" name="target_date" id="target_date" value="{{ target_date }}" required>
       </div>
 
       <div>
-        <label for="background_color">Couleur de fond :</label>
-        <input type="color" id="background_color" name="background_color"
-		        value="{{ config.background_color }}">
+        <label>Couleur de fond :</label>
+        <input type="color" name="background_color" id="background_color" value="{{ config.background_color }}">
       </div>
 
       <div>
-        <label for="text_color">Couleur du texte :</label>
-        <input type="color" id="text_color" name="text_color"
-		        value="{{ config.text_color }}">
+        <label>Couleur du texte :</label>
+        <input type="color" name="text_color" id="text_color" value="{{ config.text_color }}">
       </div>
 
       <div>
-        <label for="font_size">Taille du texte (px) :</label>
-        <input type="number" id="font_size" name="font_size"
-		        value="{{ config.font_size }}" min="10" max="120">
+        <label>Taille du texte (px) :</label>
+        <input type="number" name="font_size" id="font_size" min="10" max="150" value="{{ config.font_size }}">
       </div>
 
-      <div>
-        <label for="message_prefix">Préfixe du message :</label>
-        <input type="text" id="message_prefix" name="message_prefix"
-		        value="{{ config.message_prefix }}">
+      <div class="full-row">
+        <label>Préfixe du message :</label>
+        <input type="text" name="message_prefix" id="message_prefix" value="{{ config.message_prefix }}">
       </div>
 
-      <button type="submit">💾 Sauvegarder la configuration</button>
+      <button type="submit">✨ Générer un nouveau countdown</button>
     </form>
 	  
-	  <!-- PREVIEW HTML DYNAMIQUE -->
-    <div class="preview-box">
-      <h2>Aperçu en direct (HTML)</h2>
-      <div id="htmlPreview">
-        Chargement…
-      </div>
-      <p class="small">Cet aperçu imite le futur GIF, mais en HTML. Le GIF final sera généré par l’URL ci-dessous.</p>
-    </div>
 	  
-	  <!-- LIEN À COPIER -->
-    <div class="link-box">
-      <h2>Lien de l'image dynamique</h2>
-      <p class="note">
-        Utilise ce lien dans la balise <code>&lt;img&gt;</code> de ton email, par exemple :<br>
-        <code>&lt;img src="{{ img_link }}" alt="Countdown"&gt;</code>
-      </p>
-      <input type="text" class="link-input" readonly value="{{ img_link }}" id="imgLinkInput">
+	  <!-- PREVIEW HTML -->
+    <div class="preview-box">
+      <h2>Aperçu en direct</h2>
+      <div id="htmlPreview">Chargement…</div>
+      <p class="small">Ceci est un aperçu HTML. Le GIF final sera généré automatiquement pour ton lien.</p>
     </div>
-  </div>
 
+    {% if img_link %}
+	  
+	  <!-- LIEN DU COUNTDOWN -->
+    <div class="link-box">
+      <h2>🎉 Countdown généré !</h2>
+
+      <p class="small">Voici ton lien unique (GIF dynamique) :</p>
+
+      <input class="link-input" readonly value="{{ img_link }}" onclick="this.select()">
+
+      <p class="small">Code HTML prêt à coller dans ton email :</p>
+
+      <div class="img-code">
+        &lt;img src="{{ img_link }}" alt="Countdown"&gt;
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+  
+  
+  <!-- SCRIPT PREVIEW DYNAMIQUE -->
   <script>
-    const targetInput = document.getElementById("target_date");
-    const bgInput = document.getElementById("background_color");
-    const txtInput = document.getElementById("text_color");
-    const sizeInput = document.getElementById("font_size");
-    const prefixInput = document.getElementById("message_prefix");
-    const previewBox = document.getElementById("htmlPreview");
+    const preview = document.getElementById("htmlPreview");
     
     function updatePreview() {
-	    const bg = bgInput.value || "#ffffff";
-	    const txt = txtInput.value || "#000000";
-	    const size = parseInt(sizeInput.value || "40", 10);
-	    const prefix = prefixInput.value || "Temps restant : ";
-	    const targetVal = targetInput.value;
+	    const bg = document.getElementById("background_color").value;
+	    const txt = document.getElementById("text_color").value;
+	    const size = parseInt(document.getElementById("font_size").value, 10);
+	    const prefix = document.getElementById("message_prefix").value;
+	    const dateInput = document.getElementById("target_date").value;
 	    
-	    previewBox.style.backgroundColor = bg;
-	    previewBox.style.color = txt;
-	    previewBox.style.fontSize = size + "px";
+	    preview.style.backgroundColor = bg;
+	    preview.style.color = txt;
+	    preview.style.fontSize = size + "px";
 	    
-	    if (!targetVal) {
-		    previewBox.textContent = "Choisis une date pour voir l’aperçu.";
+	    if (!dateInput) {
+		    preview.textContent = "Choisis une date pour voir l’aperçu.";
 		    return;
 	    }
 	    
-	    const targetDate = new Date(targetVal);
-	    if (isNaN(targetDate.getTime())) {
-		    previewBox.textContent = "Date invalide";
-		    return;
-	    }
-	    
+	    const target = new Date(dateInput);
 	    const now = new Date();
-	    const diff = targetDate - now;
-	    if (diff <= 0) {
-		    previewBox.textContent = "⏰ Terminé !";
+	    const diff = target - now;
+	    
+	    if (isNaN(diff) || diff <= 0) {
+		    preview.textContent = "⏰ Terminé !";
 		    return;
 	    }
 	    
@@ -218,17 +218,19 @@
 	    const minutes = Math.floor((totalSeconds % 3600) / 60);
 	    const seconds = totalSeconds % 60;
 	    
-	    previewBox.textContent = `${prefix}${days}j ${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+	    preview.textContent =
+			    `${prefix}${days}j ${
+					    String(hours).padStart(2,"0")}:${
+					    String(minutes).padStart(2,"0")}:${
+					    String(seconds).padStart(2,"0")}`;
     }
     
-    // Mise à jour en continu toutes les secondes
+    // Mise à jour continue
     setInterval(updatePreview, 1000);
-    
-    // Mise à jour à chaque changement de champ
     document.getElementById("configForm").addEventListener("input", updatePreview);
     
-    // Premier calcul à l’ouverture
     updatePreview();
   </script>
+
 </body>
 </html>
