@@ -65,7 +65,7 @@ override the command, ensure these values stay aligned to avoid failed deploys.
 > Railway invokes [`mise`](https://mise.jdx.dev/) during its build phase. When no
 > language version is pinned, `mise` attempts to download precompiled Python archives,
 > which can intermittently fail with `500 Internal Server Error`. A checked-in
-> [`.mise.toml`](.mise.toml) configures `python = "system"` so Railway reuses the system
+> [`./.tool-versions`](.tool-versions) configures `python system` so Railway reuses the system
 > interpreter that is already available in the container instead of attempting to fetch a
 > toolchain, preventing the `mise install python` failure.
 
