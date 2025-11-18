@@ -3,13 +3,14 @@ from __future__ import annotations
 
 import base64
 import hashlib
-
+import os
 from dataclasses import dataclass
+from datetime import timedelta
 
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from zoneinfo import ZoneInfo
-from datetime import timedelta
 
 from .config import get_settings
 from .models import CountdownRequest, CountdownResponse, HealthResponse
@@ -94,3 +95,14 @@ def countdown_embed(request: CountdownRequest) -> CountdownResponse:
 @app.get("/", include_in_schema=False)
 def root() -> dict[str, str]:
     return {"message": "Countdown service is running", "docs": "/docs"}
+
+
+def _resolve_port() -> int:
+    try:
+        return int(os.environ.get("PORT", "8000"))
+    except ValueError:
+        return 8000
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host=os.environ.get("HOST", "0.0.0.0"), port=_resolve_port())

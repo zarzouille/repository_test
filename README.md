@@ -46,6 +46,20 @@ requirements.txt
    documentation and [http://localhost:8000/health](http://localhost:8000/health) to
    inspect the cache (item count plus TTL).
 
+### Deploying on Railway
+
+Railway automatically injects a `PORT` environment variable and expects services to
+listen on `0.0.0.0`. This repository includes both a `Procfile` and `railway.toml`, so no
+manual configuration is required. After connecting the repo to Railway, the default
+deploy runs the same Uvicorn command used locally but binds to the platform port:
+
+```
+uvicorn countdown_service.main:app --host 0.0.0.0 --port ${PORT}
+```
+
+The deployment definition also reuses the `/health` endpoint as the health check. If you
+override the command, ensure these values stay aligned to avoid failed deploys.
+
 ## Example Usage
 
 Request a PNG asset via the `/countdown/asset` endpoint:
